@@ -4,10 +4,32 @@ module AffiliateCredits
   def create_affiliate_credits(sender, recipient, event)
     #check if sender should receive credit on affiliate register
     if sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_#{event}_amount".to_sym] and sender_credit_amount.to_f > 0
-      credit = Spree::StoreCredit.create({:amount => sender_credit_amount,
-                         :remaining_amount => sender_credit_amount,
-                         :reason => "Affiliate: #{event}", :user => sender}, :without_protection => true)
-
+      credit = sender.store_credits.find_by_reason("Referral Credits")
+      if credit.blank?
+        reason = Spree::StoreCreditReason.find_or_create_by_name("Referral Credits")
+        reason.store_credits.create(:amount => sender_credit_amount,
+                         :remaining_amount => sender_credit_amount.to_f,
+                         :user_id => sender.id,
+                         :expiry => "2013-12-31 18:00:00", :applies_on => 1)
+      else
+        credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
+                               :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
+      end
+      
+      #Bonus credits
+      if sender.affiliates.count == 25
+        sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_25_amount".to_sym] and sender_credit_amount.to_f > 0
+        credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
+                               :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
+      elsif sender.affiliates.count == 50
+        sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_50_amount".to_sym] and sender_credit_amount.to_f > 0
+        credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
+                               :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
+      elsif sender.affiliates.count == 100
+        sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_100_amount".to_sym] and sender_credit_amount.to_f > 0
+        credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
+                               :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
+      end
       log_event recipient.affiliate_partner, sender, credit, event
     end
 

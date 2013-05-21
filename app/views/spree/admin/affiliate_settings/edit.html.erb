@@ -8,6 +8,20 @@
 	<label><%= t("sender_credit_on_register_amount") %></label>
 	<%= text_field_tag('preferences[sender_credit_on_register_amount]', SpreeAffiliate::Config[:sender_credit_on_register_amount]) %>
   </p>
+  
+  <p>
+	<label><%= t("sender_credit_on_register_25") %></label>
+	<%= text_field_tag('preferences[sender_credit_on_register_25_amount]', SpreeAffiliate::Config[:sender_credit_on_register_25_amount]) %>
+  </p>
+  <p>
+	<label><%= t("sender_credit_on_register_50") %></label>
+	<%= text_field_tag('preferences[sender_credit_on_register_50_amount]', SpreeAffiliate::Config[:sender_credit_on_register_50_amount]) %>
+  </p>
+  <p>
+	<label><%= t("sender_credit_on_register_100") %></label>
+	<%= text_field_tag('preferences[sender_credit_on_register_100_amount]', SpreeAffiliate::Config[:sender_credit_on_register_100_amount]) %>
+  </p>
+  
   <p>
 	<label><%= t('recipient_credit_on_register_amount') %></label>
 	<%= text_field_tag('preferences[recipient_credit_on_register_amount]', SpreeAffiliate::Config[:recipient_credit_on_register_amount])%>
