@@ -60,7 +60,7 @@ module AffiliateCredits
       Spree::Notification.create_notification(user.id,"#{str}. Know More")
     end
     
-    str = "You joined Styletag and your friend #{spree_current_user.firstname} got free vouchers. Invite & Earn free credits now"
+    str = "You joined Styletag and your friend #{user.firstname} got free vouchers. Invite & Earn free credits now"
     if Spree::Notification.where("user_id = ? and ('DAY(created_at) = ? AND MONTH(created_at) = ?) and content like ?", recipient.id, Date.today.day,Date.today.month, "%#{str}%")
       Spree::Notification.create_notification(recipient.id,"#{str}. Know More")
     end
