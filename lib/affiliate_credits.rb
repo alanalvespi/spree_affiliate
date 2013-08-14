@@ -9,10 +9,11 @@ module AffiliateCredits
       credit = sender.store_credits.find_by_store_credit_reason_id(reason.id)
       if credit.blank?
         
-        reason.store_credits.create({:amount => sender_credit_amount,
+		credit = reason.store_credits.create({:amount => sender_credit_amount,
                          :remaining_amount => sender_credit_amount.to_f,
                          :user_id => sender.id,
                          :expiry => "2013-12-31 18:00:00", :applies_on => 1,:store_credit_type_id => type.id}, :without_protection => true)
+      puts credit
       else
         credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
                                :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
