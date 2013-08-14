@@ -58,12 +58,12 @@ module AffiliateCredits
   def notify_event(recipient, user, credit, event)
     str = "#{spree_current_user.firstname} has joined Styletag. You have REFERRAL vouchers worth Rs. #{credit.remaining_amount}"
     if Spree::Notification.where("user_id = ? and ('DAY(created_at) = ? AND MONTH(created_at) = ?) and content like ?", recipient.id, Date.today.day,Date.today.month, "%#{str}%")
-      Spree::Notification.create_notification(user.id,"#{str}. Know More")
+      Spree::Notification.create_notification(user.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
     end
     
     str = "You joined Styletag and your friend #{user.firstname} got free vouchers. Invite & Earn free credits now"
     if Spree::Notification.where("user_id = ? and ('DAY(created_at) = ? AND MONTH(created_at) = ?) and content like ?", recipient.id, Date.today.day,Date.today.month, "%#{str}%")
-      Spree::Notification.create_notification(recipient.id,"#{str}. Know More")
+      Spree::Notification.create_notification(recipient.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
     end
   end
 
