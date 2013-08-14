@@ -13,7 +13,7 @@ module AffiliateCredits
                          :remaining_amount => sender_credit_amount.to_f,
                          :user_id => sender.id,
                          :expiry => "2013-12-31 18:00:00", :applies_on => 1,:store_credit_type_id => type.id}, :without_protection => true)
-      puts credit
+	
       else
         credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
                                :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
@@ -40,13 +40,13 @@ module AffiliateCredits
 
     #check if affiliate should recevied credit on sign up
     if recipient_credit_amount = SpreeAffiliate::Config["recipient_credit_on_#{event}_amount".to_sym] and recipient_credit_amount.to_f > 0
-      reason = Spree::StoreCreditReason.find_or_create_by_name("Affiliate: #{event}")
-      type = Spree::StoreCreditType.find_or_create_by_name("Affiliate: #{event}")
-      credit = reason.store_credits.create({:amount => recipient_credit_amount,
-                         :remaining_amount => recipient_credit_amount,
-                         :user => recipient,:store_credit_type_id => type.id}, :without_protection => true)
-
-      log_event recipient.affiliate_partner, recipient, credit, event
+      #reason = Spree::StoreCreditReason.find_or_create_by_name("Affiliate: #{event}")
+      #type = Spree::StoreCreditType.find_or_create_by_name("Affiliate: #{event}")
+      #credit = reason.store_credits.create({:amount => recipient_credit_amount,
+      #                  :remaining_amount => recipient_credit_amount,
+      #                  :user => recipient,:store_credit_type_id => type.id}, :without_protection => true)
+      #
+      #log_event recipient.affiliate_partner, recipient, credit, event
     end
 
   end
@@ -57,14 +57,10 @@ module AffiliateCredits
   
   def notify_event(recipient, user, credit, event)
     str = "#{spree_current_user.firstname} has joined Styletag. You have REFERRAL vouchers worth Rs. #{credit.remaining_amount}"
-    if Spree::Notification.where("user_id = ? and ('DAY(created_at) = ? AND MONTH(created_at) = ?) and content like ?", recipient.id, Date.today.day,Date.today.month, "%#{str}%")
-      Spree::Notification.create_notification(user.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
-    end
+    Spree::Notification.create_notification(user.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
     
     str = "You joined Styletag and your friend #{user.firstname} got free vouchers. Invite & Earn free credits now"
-    if Spree::Notification.where("user_id = ? and ('DAY(created_at) = ? AND MONTH(created_at) = ?) and content like ?", recipient.id, Date.today.day,Date.today.month, "%#{str}%")
-      Spree::Notification.create_notification(recipient.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
-    end
+    Spree::Notification.create_notification(recipient.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
   end
 
   def check_affiliate
