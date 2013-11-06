@@ -56,7 +56,7 @@ module AffiliateCredits
   end
   
   def notify_event(recipient, user, credit, event)
-    str = "#{spree_current_user.firstname} has joined Styletag. You have REFERRAL vouchers worth Rs. #{credit.remaining_amount}"
+    str = "#{recipient.firstname} has joined Styletag. You have REFERRAL vouchers worth Rs. #{credit.remaining_amount}"
     Spree::Notification.create_notification(user.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
     
     str = "You joined Styletag and your friend #{user.firstname} got free vouchers. Invite & Earn free credits now"
