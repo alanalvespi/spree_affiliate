@@ -53,8 +53,8 @@ module AffiliateCredits
         credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
                                :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
       end
-      log_event sender.affiliate_partner, recipient, credit, event
-      notify_event recipient, sender, credit, event
+      log_event recipient.affiliate_partner, sender, credit, event
+      notify_user recipient, sender, credit, event
   end
   
     #check if affiliate should recevied credit on sign up
@@ -74,6 +74,14 @@ module AffiliateCredits
     affiliate.events.create({:reward => credit, :name => event, :user => user}, :without_protection => true)
   end
   
+  def notify_user(recipient, user, credit, event)
+    str = "You have Affiliate purchase vouchers worth Rs. #{credit.remaining_amount} on purchase made by #{recipient.firstname}"
+    Spree::Notification.create_notification(user.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
+    
+    str = "Your purchase on Styletag has offered free vouchers to your friend #{user.firstname}. Invite & Earn free credits now"
+    Spree::Notification.create_notification(recipient.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
+end
+
   def notify_event(recipient, user, credit, event)
     str = "#{recipient.firstname} has joined Styletag. You have REFERRAL vouchers worth Rs. #{credit.remaining_amount}"
     Spree::Notification.create_notification(user.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
@@ -81,6 +89,7 @@ module AffiliateCredits
     str = "You joined Styletag and your friend #{user.firstname} got free vouchers. Invite & Earn free credits now"
     Spree::Notification.create_notification(recipient.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
   end
+
 
   def check_affiliate
     @user.reload if @user.present? and not @user.new_record?
