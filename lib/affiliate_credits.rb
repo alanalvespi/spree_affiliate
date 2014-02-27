@@ -3,7 +3,7 @@ module AffiliateCredits
 
   def create_affiliate_credits(sender, recipient, event)
     #check if sender should receive credit on affiliate register
-    if sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_#{event}_amount".to_sym] and sender_credit_amount.to_f > 0
+    if sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_#{event}_amount".to_sym] and sender_credit_amount.to_f > 0 and event =="register"
       reason = Spree::StoreCreditReason.find_or_create_by_name("Referral Credits")
       type = Spree::StoreCreditType.find_or_create_by_name("Referral Credits")
       credit = sender.store_credits.find_by_store_credit_reason_id(reason.id)
@@ -35,9 +35,28 @@ module AffiliateCredits
       end
       log_event recipient.affiliate_partner, sender, credit, event
       notify_event recipient, sender, credit, event
-    end
-
-
+  end
+  
+   #check if sender should receive credit on affiliate purchase
+  if sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_#{event}_amount".to_sym] and sender_credit_amount.to_f > 0 && event=="purchase"
+      reason = Spree::StoreCreditReason.find_or_create_by_name("Affiliate: #{event}")
+      type = Spree::StoreCreditType.find_or_create_by_name("Affiliate: #{event}")
+      credit = sender.store_credits.find_by_store_credit_reason_id(reason.id)
+      if credit.blank?
+        
+		credit = reason.store_credits.create({:amount => sender_credit_amount,
+                         :remaining_amount => sender_credit_amount.to_f,
+                         :user_id => sender.id,
+                         :expiry => "2014-12-31 18:00:00", :applies_on => 1,:store_credit_type_id => type.id}, :without_protection => true)
+	
+      else
+        credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
+                               :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
+      end
+      log_event sender.affiliate_partner, recipient, credit, event
+      notify_event recipient, sender, credit, event
+  end
+  
     #check if affiliate should recevied credit on sign up
     if recipient_credit_amount = SpreeAffiliate::Config["recipient_credit_on_#{event}_amount".to_sym] and recipient_credit_amount.to_f > 0
       #reason = Spree::StoreCreditReason.find_or_create_by_name("Affiliate: #{event}")
