@@ -2,6 +2,15 @@ Spree::UserRegistrationsController.class_eval do
   include AffiliateCredits
 
   after_filter :check_affiliate, :only => :create
+  
+  
+  def new
+    if params[:ref_id]
+      cookies.permanent[:ref_id] = params[:ref_id]
+      cookies.permanent[:src] = "referral"
+    end
+    super
+  end
 
   private
 
