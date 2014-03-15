@@ -1,4 +1,5 @@
 module AffiliateCredits
+include SMS 
   private
 
   def create_affiliate_credits(sender, recipient, event)
@@ -35,6 +36,8 @@ module AffiliateCredits
       end
       log_event recipient.affiliate_partner, sender, credit, event
       notify_event recipient, sender, credit, event
+      UserMailers.user_purchased(sender,recipient,sender_credit_amount,"register","Congratulations! You've got store credits!").deliver
+      UserMailers.user_notification(recipient,sender,sender_credit_amount,"register","Get your friends to join Styletag & win store credits!").deliver
   end
   
    #check if sender should receive credit on affiliate purchase
@@ -55,6 +58,9 @@ module AffiliateCredits
       end
       log_event recipient.affiliate_partner, sender, credit, event
       notify_user recipient, sender, credit, event
+      UserMailers.user_purchased(sender,recipient,sender_credit_amount,"purchase","Congratulations! You've got store credits!").deliver
+      UserMailers.user_notification(recipient,sender,sender_credit_amount,"purchase","Ask your friends to shop on Styletag & get store credits").deliver
+      #~ Spree::Order.cod_order_confirmation(Spree::Order.last,Spree::Order.last.number, "8951246163")
   end
   
     #check if affiliate should recevied credit on sign up
