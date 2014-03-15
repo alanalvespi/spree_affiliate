@@ -42,8 +42,8 @@ include SMS
   
    #check if sender should receive credit on affiliate purchase
   if sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_#{event}_amount".to_sym] and sender_credit_amount.to_f > 0 && event=="purchase"
-      reason = Spree::StoreCreditReason.find_or_create_by_name("Affiliate: #{event}")
-      type = Spree::StoreCreditType.find_or_create_by_name("Affiliate: #{event}")
+      reason = Spree::StoreCreditReason.find_or_create_by_name("Referral Purchase")
+      type = Spree::StoreCreditType.find_or_create_by_name("Referral Purchase")
       credit = sender.store_credits.find_by_store_credit_reason_id(reason.id)
       if credit.blank?
         
