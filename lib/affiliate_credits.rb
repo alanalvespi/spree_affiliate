@@ -79,22 +79,22 @@ include SMS
   def log_event(affiliate, user, credit, event)
     affiliate.events.create({:reward => credit, :name => event, :user => user}, :without_protection => true)
   end
-  
-  def notify_user(recipient, user, credit, event,sender_credit_amount)
-    str = " Hey! You've got referral credits worth Rs.#{sender_credit_amount} because your friend #{recipient.firstname} just made the first purchase on Styletag Your have referral credits worth Rs.#{credit.remaining_amount} right now"
-    Spree::Notification.create_notification(user.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
-    
-    str = "Your purchase on Styletag has offered free vouchers to your friend #{user.firstname}. Invite & Earn free credits now"
-    Spree::Notification.create_notification(recipient.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
+
+def notify_user(recipient, user, credit, event,sender_credit_amount)
+  str = "It pays to have friends! Your friend #{recipient.firstname} just shopped, and we are delighted to credit Rs. #{sender_credit_amount} into your Styletag Referral Credits. Crave More, Invite More www.styletag.com/invite"
+  Spree::Notification.create_notification(user.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
+
+  str = "You are destiny’s child! Your friend #{user.firstname} just got referral credits worth Rs. #{sender_credit_amount} because you just made your first purchase! Want some for yourself? Invite your friends now - www.styletag.com/invite"
+  Spree::Notification.create_notification(recipient.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
 end
 
-  def notify_event(recipient, user, credit, event,sender_credit_amount)
-    str = "Hey! You've got referral credits worth Rs.#{sender_credit_amount} because your friend #{recipient.firstname} just joined Styletag! Your have referral credits worth #{credit.remaining_amount} right now."
-    Spree::Notification.create_notification(user.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
-    
-    str = "You joined Styletag and your friend #{user.firstname} got free vouchers. Invite & Earn free credits now"
-    Spree::Notification.create_notification(recipient.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
-  end
+def notify_event(recipient, user, credit, event,sender_credit_amount)
+  str = "It's your lucky day! Your friend #{recipient.firstname} just joined Styletag & we have credited Rs. #{sender_credit_amount} into your Styletag Referral Credits. Hoard More, Invite More -www.styletag.com/invite"
+  Spree::Notification.create_notification(user.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
+
+  str = "You just made #{user.firstname}'s day awesome! #{user.firstname} just got referral credits worth Rs. #{sender_credit_amount} because you just joined Styletag. Get Rs 1000 + 50 for every friend you INVITE - www.styletag.com/invite"
+  Spree::Notification.create_notification(recipient.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
+end
 
 
   def check_affiliate
