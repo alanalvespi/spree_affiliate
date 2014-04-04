@@ -81,18 +81,18 @@ include SMS
   end
 
 def notify_user(recipient, user, credit, event,sender_credit_amount)
-  str = "It pays to have friends! <br /> Your friend #{recipient.firstname} just shopped, <br />and we are delighted to credit Rs.#{sender_credit_amount} <br />into your Styletag Referral Credits.<br /> Crave More, Invite More <br />www.styletag.com/invite"
+  str = "<p>It pays to have friends! <br /> Your friend #{recipient.firstname} just shopped, <br />and we are delighted to credit Rs.#{sender_credit_amount} <br />into your Styletag Referral Credits.<br /> Crave More, Invite More <br />www.styletag.com/invite</p>"
   Spree::Notification.create_notification(user.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
 
-  str = "You are destiny’s child! <br />Your friend #{user.firstname} <br />just got referral credits <br />worth Rs. #{sender_credit_amount} because you <br />just made your first purchase! <br />Want some for yourself? Invite your friends now - <br />www.styletag.com/invite"
+  str = "<p>You are destiny’s child! <br />Your friend #{user.firstname} <br />just got referral credits <br />worth Rs. #{sender_credit_amount} because you <br />just made your first purchase! <br />Want some for yourself? Invite your friends now - <br />www.styletag.com/invite</p>"
   Spree::Notification.create_notification(recipient.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
 end
 
 def notify_event(recipient, user, credit, event,sender_credit_amount)
-  str = "It's your lucky day! <br />Your friend #{recipient.firstname} <br />just joined Styletag & we have <br />credited Rs. #{sender_credit_amount} into your Styletag <br />Referral Credits. Hoard More, <br />Invite More -www.styletag.com/invite"
+  str = "<p>It's your lucky day! <br />Your friend #{recipient.firstname} <br />just joined Styletag & we have <br />credited Rs. #{sender_credit_amount} into your Styletag <br />Referral Credits. Hoard More, <br />Invite More -www.styletag.com/invite</p>"
   Spree::Notification.create_notification(user.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
 
-  str = "You just made #{user.firstname}'s day awesome! <br />#{user.firstname} just got referral credits <br />worth Rs. #{sender_credit_amount} because you just <br />joined Styletag. Get Rs 1000 + 50 <br />for every friend you INVITE - <br />www.styletag.com/invite"
+  str = "<p>You just made #{user.firstname}'s day awesome! <br />#{user.firstname} just got referral credits <br />worth Rs. #{sender_credit_amount} because you just <br />joined Styletag. Get Rs 1000 + 50 <br />for every friend you INVITE - <br />www.styletag.com/invite</p>"
   Spree::Notification.create_notification(recipient.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
 end
 
