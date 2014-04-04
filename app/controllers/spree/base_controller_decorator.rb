@@ -4,6 +4,7 @@ Spree::BaseController.class_eval do
   private
   
   def remember_affiliate
+    session[:return_to] = "/invite"
     cookies.permanent[:ref_id] = params[:ref_id] if params[:ref_id]
   end
 end

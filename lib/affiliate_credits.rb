@@ -1,9 +1,10 @@
 module AffiliateCredits
+include SMS 
   private
 
   def create_affiliate_credits(sender, recipient, event)
     #check if sender should receive credit on affiliate register
-    if sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_#{event}_amount".to_sym] and sender_credit_amount.to_f > 0
+    if sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_#{event}_amount".to_sym] and sender_credit_amount.to_f > 0 and event =="register"
       reason = Spree::StoreCreditReason.find_or_create_by_name("Referral Credits")
       type = Spree::StoreCreditType.find_or_create_by_name("Referral Credits")
       credit = sender.store_credits.find_by_store_credit_reason_id(reason.id)
@@ -34,10 +35,34 @@ module AffiliateCredits
                                :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
       end
       log_event recipient.affiliate_partner, sender, credit, event
-      notify_event recipient, sender, credit, event
-    end
-
-
+      notify_event recipient, sender, credit, event,sender_credit_amount
+      UserMailers.user_purchased(sender,recipient,sender_credit_amount,"register","Say what! #{recipient.firstname} just joined Styletag. You've got Rs.#{sender_credit_amount} referral credits!").deliver
+      UserMailers.user_notification(recipient,sender,sender_credit_amount,"register","#{sender.firstname} got Rs.#{sender_credit_amount} referral credits! Want some?").deliver
+  end
+  
+   #check if sender should receive credit on affiliate purchase
+  if sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_#{event}_amount".to_sym] and sender_credit_amount.to_f > 0 && event=="purchase"
+      reason = Spree::StoreCreditReason.find_or_create_by_name("Referral Credits")
+      type = Spree::StoreCreditType.find_or_create_by_name("Referral Credits")
+      credit = sender.store_credits.find_by_store_credit_reason_id(reason.id)
+      if credit.blank?
+        
+		credit = reason.store_credits.create({:amount => sender_credit_amount,
+                         :remaining_amount => sender_credit_amount.to_f,
+                         :user_id => sender.id,
+                         :expiry => "2014-12-31 18:00:00", :applies_on => 1,:store_credit_type_id => type.id}, :without_protection => true)
+	
+      else
+        credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
+                               :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
+      end
+      log_event recipient.affiliate_partner, sender, credit, event
+      notify_user recipient, sender, credit, event,sender_credit_amount
+      UserMailers.user_purchased(sender,recipient,sender_credit_amount,"purchase","#{recipient.firstname} got Rs.#{sender_credit_amount} referral credits! Get yours too!").deliver
+      UserMailers.user_notification(recipient,sender,sender_credit_amount,"purchase","Lucky day! You've got Rs.#{sender_credit_amount} referral credits!").deliver
+      #~ Spree::Order.cod_order_confirmation(Spree::Order.last,Spree::Order.last.number, "8951246163")
+  end
+  
     #check if affiliate should recevied credit on sign up
     if recipient_credit_amount = SpreeAffiliate::Config["recipient_credit_on_#{event}_amount".to_sym] and recipient_credit_amount.to_f > 0
       #reason = Spree::StoreCreditReason.find_or_create_by_name("Affiliate: #{event}")
@@ -54,14 +79,23 @@ module AffiliateCredits
   def log_event(affiliate, user, credit, event)
     affiliate.events.create({:reward => credit, :name => event, :user => user}, :without_protection => true)
   end
-  
-  def notify_event(recipient, user, credit, event)
-    str = "#{recipient.firstname} has joined Styletag. You have REFERRAL vouchers worth Rs. #{credit.remaining_amount}"
-    Spree::Notification.create_notification(user.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
-    
-    str = "You joined Styletag and your friend #{user.firstname} got free vouchers. Invite & Earn free credits now"
-    Spree::Notification.create_notification(recipient.id,"#{str}. <a href='/account#my-vouchers'>Know More</a>")
-  end
+
+def notify_user(recipient, user, credit, event,sender_credit_amount)
+  str = "It pays to have friends! Your friend #{recipient.firstname} just shopped, and we are delighted to credit Rs.#{sender_credit_amount} into your Styletag Referral Credits. Crave More, Invite More www.styletag.com/invite"
+  Spree::Notification.create_notification(user.id,"<p>#{str}. <a href='/account#my-vouchers'>Know More</a></p>")
+
+  str = "You are destiny’s child! Your friend #{user.firstname} just got referral credits worth Rs.#{sender_credit_amount} because you just made your first purchase! Want some for yourself? Invite your friends now - www.styletag.com/invite"
+  Spree::Notification.create_notification(recipient.id,"<p>#{str}. <a href='/account#my-vouchers'>Know More</a></p>")
+end
+
+def notify_event(recipient, user, credit, event,sender_credit_amount)
+  str = "It's your lucky day! Your friend #{recipient.firstname} just joined Styletag & we have credited Rs.#{sender_credit_amount} into your Styletag Referral Credits. Hoard More, Invite More -www.styletag.com/invite"
+  Spree::Notification.create_notification(user.id,"<p>#{str}. <a href='/account#my-vouchers'>Know More</a></p>")
+
+  str = "You just made #{user.firstname}'s day awesome! #{user.firstname} just got referral credits worth Rs.#{sender_credit_amount} because you just joined Styletag. Get Rs 1000 + 50 for every friend you INVITE - www.styletag.com/invite"
+  Spree::Notification.create_notification(recipient.id,"<p>#{str}. <a href='/account#my-vouchers'>Know More</a></p>")
+end
+
 
   def check_affiliate
     @user.reload if @user.present? and not @user.new_record?
