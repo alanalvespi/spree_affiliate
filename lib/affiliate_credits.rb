@@ -58,8 +58,8 @@ include SMS
       end
       log_event recipient.affiliate_partner, sender, credit, event
       notify_user recipient, sender, credit, event,sender_credit_amount
-      UserMailers.user_purchased(sender,recipient,sender_credit_amount,"purchase","#{recipient.firstname} got Rs.#{sender_credit_amount} referral credits! Get yours too!").deliver
-      UserMailers.user_notification(recipient,sender,sender_credit_amount,"purchase","Lucky day! You've got Rs.#{sender_credit_amount} referral credits!").deliver
+      UserMailers.user_purchased(sender,recipient,sender_credit_amount,"purchase","Lucky day! You've got Rs.#{sender_credit_amount} referral credits!").deliver
+      UserMailers.user_notification(recipient,sender,sender_credit_amount,"purchase","#{sender.firstname} got Rs.#{sender_credit_amount} referral credits! Get yours too!").deliver
       #~ Spree::Order.cod_order_confirmation(Spree::Order.last,Spree::Order.last.number, "8951246163")
   end
   
@@ -81,21 +81,21 @@ include SMS
   end
 
 def notify_user(recipient, user, credit, event,sender_credit_amount)
-  str = "It pays to have friends! Your friend #{recipient.firstname} just shopped, and we are delighted to credit Rs.#{sender_credit_amount} into your Styletag Referral Credits. Crave More, Invite More www.styletag.com/invite"
-  Spree::Notification.create_notification(user.id,"<p>#{str}. <a href='/account#my-vouchers'>Know More</a></p>")
+  str = "It pays to have friends! Your friend #{recipient.firstname} just shopped, and we are delighted to credit Rs.#{sender_credit_amount} into your Styletag Referral Credits. <a href='/invite'> Crave More, Invite More.</a>"
+  Spree::Notification.create_notification(user.id,"<p>#{str}. <a href='/account#my-vouchers'>Click here to see your vouchers</a></p>")
 
-  str = "You are destiny’s child! Your friend #{user.firstname} just got referral credits worth Rs.#{sender_credit_amount} because you just made your first purchase! Want some for yourself? Invite your friends now - www.styletag.com/invite"
-  Spree::Notification.create_notification(recipient.id,"<p>#{str}. <a href='/account#my-vouchers'>Know More</a></p>")
+  str = "You are destiny’s child! Your friend #{user.firstname} just got referral credits worth Rs.#{sender_credit_amount} because you just made your first purchase! Want some for yourself? <a href='/invite'>Invite your friends now.</a>"
+  Spree::Notification.create_notification(recipient.id,"<p>#{str}. <a href='/account#my-vouchers'>Click here to see your vouchers</a></p>")
 end
 
 def notify_event(recipient, user, credit, event,sender_credit_amount)
-  str = "It's your lucky day! Your friend #{recipient.firstname} just joined Styletag & we have credited Rs.#{sender_credit_amount} into your Styletag Referral Credits. Hoard More, Invite More -www.styletag.com/invite"
-  Spree::Notification.create_notification(user.id,"<p>#{str}. <a href='/account#my-vouchers'>Know More</a></p>")
+  str = "It's your lucky day! Your friend #{recipient.firstname} just joined Styletag & we have credited Rs.#{sender_credit_amount} into your Styletag Referral Credits. <a href='/invite'>Hoard More, Invite More.</a>"
+  Spree::Notification.create_notification(user.id,"<p>#{str}. <a href='/account#my-vouchers'>Click here to see your vouchers</a></p>")
 
-  str = "You just made #{user.firstname}'s day awesome! #{user.firstname} just got referral credits worth Rs.#{sender_credit_amount} because you just joined Styletag. Get Rs 1000 + 50 for every friend you INVITE - www.styletag.com/invite"
-  Spree::Notification.create_notification(recipient.id,"<p>#{str}. <a href='/account#my-vouchers'>Know More</a></p>")
+  str = "You just made #{user.firstname}'s day awesome! #{user.firstname} just got referral credits worth Rs.#{sender_credit_amount} because you just joined Styletag. <a href='/invite'>Get Rs 1000 + 50 for every friend you INVITE.</a>"
+  Spree::Notification.create_notification(recipient.id,"<p>#{str}. <a href='/account#my-vouchers'>Click here to see your vouchers</a></p>")
 end
-
+                                                                                                                             ``
 
   def check_affiliate
     @user.reload if @user.present? and not @user.new_record?
