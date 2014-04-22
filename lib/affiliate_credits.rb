@@ -86,6 +86,16 @@ def notify_user(recipient, user, credit, event,sender_credit_amount)
 
   str = "You are destiny’s child! Your friend #{user.firstname} just got referral credits worth Rs.#{sender_credit_amount} because you just made your first purchase! Want some for yourself? <a href='/invite'>Invite your friends now.</a>"
   Spree::Notification.create_notification(recipient.id,"<p>#{str}. <a href='/account#my-vouchers'>Click here to see your vouchers</a></p>")
+
+  #sms
+  user_mob_no = user.addresses.last.phone rescue nil
+  sms_text ="Your friend #{recipient.firstname} just shopped &amp; you've got Rs.1000 Styletag referral credits! Crave More, Invite More - www.styletag.com/invite"
+  sms_notification(user, "#{user_mob_no}" , sms_text) unless user_mob_no.nil?
+
+  recipient_mob_no = recipient.addresses.last.phone rescue nil
+  sms_text = "#{user.firstname} just got Rs.1000 referral credits as you made your 1st buy! Want some? Invite now - www.styletag.com/invite"
+  sms_notification(recipient, "#{recipient_mob_no}" , sms_text) unless recipient_mob_no.nil?
+
 end
 
 def notify_event(recipient, user, credit, event,sender_credit_amount)
@@ -94,6 +104,16 @@ def notify_event(recipient, user, credit, event,sender_credit_amount)
 
   str = "You just made #{user.firstname}'s day awesome! #{user.firstname} just got referral credits worth Rs.#{sender_credit_amount} because you just joined Styletag. <a href='/invite'>Get Rs 1000 + 50 for every friend you INVITE.</a>"
   Spree::Notification.create_notification(recipient.id,"<p>#{str}. <a href='/account#my-vouchers'>Click here to see your vouchers</a></p>")
+
+  #sms
+  user_mob_no = user.addresses.last.phone rescue nil
+  sms_text = "Your friend #{recipient.firstname} just joined Styletag &amp; you've got Rs.50 referral credits! Hoard More, Invite More - www.styletag.com/invite"
+  sms_notification(user, "#{user_mob_no}" , sms_text) unless user_mob_no.nil?
+
+  recipient_mob_no = recipient.addresses.last.phone rescue nil
+  sms_text = "You made #{user.firstname}'s day by joining Styletag! #{user.firstname} got Rs.50 referral credits. Get Rs.1000+50 for each friend you INVITE - www.styletag.com/invite"
+  sms_notification(recipient, "#{recipient_mob_no}" , sms_text) unless recipient_mob_no.nil?
+
 end
                                                                                                                              ``
 
