@@ -132,4 +132,36 @@ end
     #destroy the cookie, as the affiliate record has been created.
     cookies[:ref_id] = nil
   end
+
+
+  def sms_notification(user, send_to, text)
+    text = mobile_mess(text)
+    tag = "credits"
+    xml = get_xml(user.id, text, send_to, tag)
+    pd = post_data(xml)
+    puts pd.body
+  end
+
+  def mobile_mess(text)
+    user_text=%Q|#{text}|%
+        user_text
+  end
+
+
+  def get_xml(seq, text, send_to, send_tag)
+    username = "intrepidonlneld"
+    password = "iorpvtld"
+
+    # Default metadata
+    send_tag = "styltg"
+    url = "http://api.myvaluefirst.com/psms/servlet/psms.Eservice2"
+    encoded_xml = %Q|<?xml version="1.0" encoding="utf-8"?><!DOCTYPE MESSAGE SYSTEM "http://127.0.0.1/psms/dtd/messagev12.dtd" ><MESSAGE VER="1.2"><USER USERNAME="#{username}" PASSWORD="#{password}"/><SMS UDH="0" CODING="1" TEXT="#{text}" PROPERTY="0" ID="#{seq}"><ADDRESS FROM="styltg" TO="#{send_to}" SEQ="#{seq}" TAG="#{send_tag}" /></SMS></MESSAGE>|%
+        encoded_xml
+  end
+
+  def post_data(xml)
+    url = "http://api.myvaluefirst.com/psms/servlet/psms.Eservice2"
+    postData = Net::HTTP.post_form(URI.parse(url), {"data"=>xml,"action"=>"send"})
+  end
+
 end
