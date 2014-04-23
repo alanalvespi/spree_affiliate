@@ -22,17 +22,20 @@ include SMS
       
       #Bonus credits
       if sender.affiliates.count == 25
-        sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_25_amount".to_sym] and sender_credit_amount.to_f > 0
-        credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
-                               :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
+        bonus_sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_25_amount".to_sym] and bonus_sender_credit_amount.to_f > 0
+        credit.update_attributes(:amount => credit.amount+bonus_sender_credit_amount.to_f,
+                               :remaining_amount => credit.remaining_amount+bonus_sender_credit_amount.to_f)
+        sender_credit_amount=bonus_sender_credit_amount+sender_credit_amount
       elsif sender.affiliates.count == 50
-        sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_50_amount".to_sym] and sender_credit_amount.to_f > 0
-        credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
-                               :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
+        bonus_sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_50_amount".to_sym] and bonus_sender_credit_amount.to_f > 0
+        credit.update_attributes(:amount => credit.amount+bonus_sender_credit_amount.to_f,
+                               :remaining_amount => credit.remaining_amount+bonus_sender_credit_amount.to_f)
+        sender_credit_amount=bonus_sender_credit_amount+sender_credit_amount
       elsif sender.affiliates.count == 100
-        sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_100_amount".to_sym] and sender_credit_amount.to_f > 0
-        credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
-                               :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
+        bonus_sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_100_amount".to_sym] and bonus_sender_credit_amount.to_f > 0
+        credit.update_attributes(:amount => credit.amount+bonus_sender_credit_amount.to_f,
+                               :remaining_amount => credit.remaining_amount+bonus_sender_credit_amount.to_f)
+        sender_credit_amount=bonus_sender_credit_amount+sender_credit_amount
       end
       log_event recipient.affiliate_partner, sender, credit, event
       notify_event recipient, sender, credit, event,sender_credit_amount
