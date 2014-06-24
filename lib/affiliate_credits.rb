@@ -22,17 +22,20 @@ include SMS
       
       #Bonus credits
       if sender.affiliates.count == 25
-        sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_25_amount".to_sym] and sender_credit_amount.to_f > 0
-        credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
-                               :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
+        bonus_sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_25_amount".to_sym] and bonus_sender_credit_amount.to_f > 0
+        credit.update_attributes(:amount => credit.amount+bonus_sender_credit_amount.to_f,
+                               :remaining_amount => credit.remaining_amount+bonus_sender_credit_amount.to_f)
+        sender_credit_amount=bonus_sender_credit_amount+sender_credit_amount
       elsif sender.affiliates.count == 50
-        sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_50_amount".to_sym] and sender_credit_amount.to_f > 0
-        credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
-                               :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
+        bonus_sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_50_amount".to_sym] and bonus_sender_credit_amount.to_f > 0
+        credit.update_attributes(:amount => credit.amount+bonus_sender_credit_amount.to_f,
+                               :remaining_amount => credit.remaining_amount+bonus_sender_credit_amount.to_f)
+        sender_credit_amount=bonus_sender_credit_amount+sender_credit_amount
       elsif sender.affiliates.count == 100
-        sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_100_amount".to_sym] and sender_credit_amount.to_f > 0
-        credit.update_attributes(:amount => credit.amount+sender_credit_amount.to_f,
-                               :remaining_amount => credit.remaining_amount+sender_credit_amount.to_f)
+        bonus_sender_credit_amount = SpreeAffiliate::Config["sender_credit_on_register_100_amount".to_sym] and bonus_sender_credit_amount.to_f > 0
+        credit.update_attributes(:amount => credit.amount+bonus_sender_credit_amount.to_f,
+                               :remaining_amount => credit.remaining_amount+bonus_sender_credit_amount.to_f)
+        sender_credit_amount=bonus_sender_credit_amount+sender_credit_amount
       end
       log_event recipient.affiliate_partner, sender, credit, event
       notify_event recipient, sender, credit, event,sender_credit_amount
@@ -86,14 +89,34 @@ def notify_user(recipient, user, credit, event,sender_credit_amount)
 
   str = "You are destiny’s child! Your friend #{user.firstname} just got referral credits worth Rs.#{sender_credit_amount} because you just made your first purchase! Want some for yourself? <a href='/invite'>Invite your friends now.</a>"
   Spree::Notification.create_notification(recipient.id,"<p>#{str}. <a href='/account#my-vouchers'>Click here to see your vouchers</a></p>")
+
+  #sms
+  user_mob_no = user.addresses.last.phone rescue nil
+  sms_text ="Your friend #{recipient.firstname} just shopped &amp; you've got Rs.1000 Styletag referral credits! Crave More, Invite More - www.styletag.com/invite"
+  sms_notification(user, "#{user_mob_no}" , sms_text) unless user_mob_no.nil?
+
+  recipient_mob_no = recipient.addresses.last.phone rescue nil
+  sms_text = "#{user.firstname} just got Rs.1000 referral credits as you made your 1st buy! Want some? Invite now - www.styletag.com/invite"
+  sms_notification(recipient, "#{recipient_mob_no}" , sms_text) unless recipient_mob_no.nil?
+
 end
 
 def notify_event(recipient, user, credit, event,sender_credit_amount)
   str = "It's your lucky day! Your friend #{recipient.firstname} just joined Styletag & we have credited Rs.#{sender_credit_amount} into your Styletag Referral Credits. <a href='/invite'>Hoard More, Invite More.</a>"
   Spree::Notification.create_notification(user.id,"<p>#{str}. <a href='/account#my-vouchers'>Click here to see your vouchers</a></p>")
 
-  str = "You just made #{user.firstname}'s day awesome! #{user.firstname} just got referral credits worth Rs.#{sender_credit_amount} because you just joined Styletag. <a href='/invite'>Get Rs 1000 + 50 for every friend you INVITE.</a>"
+  str = "You just made #{user.firstname}'s day awesome! #{user.firstname} just got referral credits worth Rs.#{sender_credit_amount} because you just joined Styletag. <a href='/invite'>Get Rs 1000 + 250 for every friend you INVITE.</a>"
   Spree::Notification.create_notification(recipient.id,"<p>#{str}. <a href='/account#my-vouchers'>Click here to see your vouchers</a></p>")
+
+  #sms
+  user_mob_no = user.addresses.last.phone rescue nil
+  sms_text = "Your friend #{recipient.firstname} just joined Styletag &amp; you've got Rs.250 referral credits! Hoard More, Invite More - www.styletag.com/invite"
+  sms_notification(user, "#{user_mob_no}" , sms_text) unless user_mob_no.nil?
+
+  recipient_mob_no = recipient.addresses.last.phone rescue nil
+  sms_text = "You made #{user.firstname}'s day by joining Styletag! #{user.firstname} got Rs.250 referral credits. Get Rs.1000+250 for each friend you INVITE - www.styletag.com/invite"
+  sms_notification(recipient, "#{recipient_mob_no}" , sms_text) unless recipient_mob_no.nil?
+
 end
                                                                                                                              ``
 
@@ -112,4 +135,36 @@ end
     #destroy the cookie, as the affiliate record has been created.
     cookies[:ref_id] = nil
   end
+
+
+  def sms_notification(user, send_to, text)
+    text = mobile_mess(text)
+    tag = "credits"
+    xml = get_xml(user.id, text, send_to, tag)
+    pd = post_data(xml)
+    puts pd.body
+  end
+
+  def mobile_mess(text)
+    user_text=%Q|#{text}|%
+        user_text
+  end
+
+
+  def get_xml(seq, text, send_to, send_tag)
+    username = "intrepidonlneld"
+    password = "iorpvtld"
+
+    # Default metadata
+    send_tag = "styltg"
+    url = "http://api.myvaluefirst.com/psms/servlet/psms.Eservice2"
+    encoded_xml = %Q|<?xml version="1.0" encoding="utf-8"?><!DOCTYPE MESSAGE SYSTEM "http://127.0.0.1/psms/dtd/messagev12.dtd" ><MESSAGE VER="1.2"><USER USERNAME="#{username}" PASSWORD="#{password}"/><SMS UDH="0" CODING="1" TEXT="#{text}" PROPERTY="0" ID="#{seq}"><ADDRESS FROM="styltg" TO="#{send_to}" SEQ="#{seq}" TAG="#{send_tag}" /></SMS></MESSAGE>|%
+        encoded_xml
+  end
+
+  def post_data(xml)
+    url = "http://api.myvaluefirst.com/psms/servlet/psms.Eservice2"
+    postData = Net::HTTP.post_form(URI.parse(url), {"data"=>xml,"action"=>"send"})
+  end
+
 end
