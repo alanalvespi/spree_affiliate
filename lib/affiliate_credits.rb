@@ -153,7 +153,7 @@ end
 
   def get_xml(seq, text, send_to, send_tag)
     username = "intrepidonlneld"
-    password = "iorpvtld"
+    password = "intrdn05"
 
     # Default metadata
     send_tag = "styltg"
