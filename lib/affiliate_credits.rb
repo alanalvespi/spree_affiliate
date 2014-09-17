@@ -105,16 +105,16 @@ def notify_event(recipient, user, credit, event,sender_credit_amount)
   str = "It's your lucky day! Your friend #{recipient.firstname} just joined Styletag & we have credited Rs.#{sender_credit_amount} into your Styletag Referral Credits. <a href='/invite'>Hoard More, Invite More.</a>"
   Spree::Notification.create_notification(user.id,"<p>#{str}. <a href='/account#my-vouchers'>Click here to see your vouchers</a></p>")
 
-  str = "You just made #{user.firstname}'s day awesome! #{user.firstname} just got referral credits worth Rs.#{sender_credit_amount} because you just joined Styletag. <a href='/invite'>Get Rs 1000 + 50 for every friend you INVITE.</a>"
+  str = "You just made #{user.firstname}'s day awesome! #{user.firstname} just got referral credits worth Rs.#{sender_credit_amount} because you just joined Styletag. <a href='/invite'>Get Rs 1000 + 250 for every friend you INVITE.</a>"
   Spree::Notification.create_notification(recipient.id,"<p>#{str}. <a href='/account#my-vouchers'>Click here to see your vouchers</a></p>")
 
   #sms
   user_mob_no = user.addresses.last.phone rescue nil
-  sms_text = "Your friend #{recipient.firstname} just joined Styletag &amp; you've got Rs.50 referral credits! Hoard More, Invite More - www.styletag.com/invite"
+  sms_text = "Your friend #{recipient.firstname} just joined Styletag &amp; you've got Rs.250 referral credits! Hoard More, Invite More - www.styletag.com/invite"
   sms_notification(user, "#{user_mob_no}" , sms_text) unless user_mob_no.nil?
 
   recipient_mob_no = recipient.addresses.last.phone rescue nil
-  sms_text = "You made #{user.firstname}'s day by joining Styletag! #{user.firstname} got Rs.50 referral credits. Get Rs.1000+50 for each friend you INVITE - www.styletag.com/invite"
+  sms_text = "You made #{user.firstname}'s day by joining Styletag! #{user.firstname} got Rs.250 referral credits. Get Rs.1000+250 for each friend you INVITE - www.styletag.com/invite"
   sms_notification(recipient, "#{recipient_mob_no}" , sms_text) unless recipient_mob_no.nil?
 
 end
